@@ -8,14 +8,20 @@
 import UIKit
 import Foundation
 import SystemConfiguration.CaptiveNetwork
+import CoreLocation
 
-class ViewController: UIViewController {
+class ViewController: UIViewController, CLLocationManagerDelegate {
     @IBOutlet weak var wifi_button: UIButton!
     @IBOutlet weak var wifi_label: UILabel!
+    var locationManager: CLLocationManager?
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view.
+        // code adapted from https://www.hackingwithswift.com/read/22/2/requesting-location-core-location
+        // need to turn on location services to get wifi permission for IOS 13 and up, unfortunately
+        locationManager = CLLocationManager()
+        locationManager?.delegate = self
+        locationManager?.requestAlwaysAuthorization()
     }
 
 
@@ -27,7 +33,7 @@ class ViewController: UIViewController {
         if let interfaces = CNCopySupportedInterfaces() as NSArray? {
             for interface in interfaces {
                 if let interfaceInfo = CNCopyCurrentNetworkInfo(interface as! CFString) as NSDictionary? {
-                    bssid = interfaceInfo[kCNNetworkInfoKeySSID as String] as? String
+                    bssid = interfaceInfo[kCNNetworkInfoKeyBSSID as String] as? String
                     break
                 }
             }
